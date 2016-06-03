@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>D3 Example</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script   src="//code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
+    <style>
+      body {
+        background: black;
+      }
+      circle {
+        fill: rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+
+      var innerWidth  = 800;
+      var innerHeight = 345;
+      var margin = { left: 150, top: 150, right: 150, bottom: 150 };
+
+      var peoplePerPixel =0.003;
+
+      var svg = d3.select("body").append("svg")
+        .attr("width",  innerWidth + margin.left)
+        .attr("height", innerHeight + margin.top);
+
+      var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var xScale = d3.scale.linear().range([0, innerWidth]);
+      var yScale = d3.scale.linear().range([innerHeight, 0]);
+      var rScale = d3.scale.sqrt();
+
+      function render(data){
+
+        xScale.domain([-124.85, -66.80]);
+        yScale.domain([24.40, 49.38]);
+
+        rScale.domain([0, d3.max(data, function (d){
+          return d["tickets_purchased_qty"];
+        })]);
+
+        var peopleMax = rScale.domain()[1];
+        var rMin = 0;
+        var rMax = Math.sqrt(peopleMax / (peoplePerPixel * Math.PI));
+        rScale.range([rMin, rMax]);
+
+        var circles = g.selectAll("circle").data(data);
+        circles.enter().append("circle");
+        circles
+          .attr("cx", function (d){
+            if (isNaN(+xScale(+getCoordinates(d["venue_postal_cd_sgmt_1"])[0]))){
+              return -100;
+            } else {
+              return xScale(+getCoordinates(d["venue_postal_cd_sgmt_1"])[0]);
+            }
+          })
+          .attr("cy", function (d){
+            if (isNaN(+yScale(+getCoordinates(d["venue_postal_cd_sgmt_1"])[1]))){
+              return -100;
+            } else {
+              return yScale(+getCoordinates(d["venue_postal_cd_sgmt_1"])[1]);
+            }
+          })
+          .attr("r",  function (d){
+            if (isNaN(+rScale(d["tickets_purchased_qty"]))){
+              return 0;
+            } else {
+              return rScale(d["tickets_purchased_qty"]);
+            }
+          })
+          .attr("id", function (d){ return d["venue_city"] + ", " + d["venue_state"]; })
+          .attr("stroke", function (d){
+            console.log("|" + d["delivery_type_cd"] + "|");
+            if (d["delivery_type_cd"]=="TicketFast") {
+              return "red";
+            }
+            else if (d["delivery_type_cd"]=="Mail"){
+              return "blue";
+            }
+            else if (d["delivery_type_cd"]=="eTicket") {
+              return "green";
+            }
+            else if (d["delivery_type_cd"]=="UPS") {
+              return "brown";
+            } else {
+              return "white";
+            }
+          });
+        circles.exit().remove();
+      }
+
+      function type(d){
+        d.trans_face_val_amt = +d.trans_face_val_amt;
+        return d;
+      }
+
+
+      function getCoordinates(input) {
+            var strUrl = "http://maps.googleapis.com/maps/api/geocode/json?address=" + input, strReturn;
+
+            jQuery.ajax({
+              url: strUrl,
+              success: function(html) {
+                strReturn = html;
+              },
+              async:false
+            });
+
+            return [strReturn.results[0].geometry.location.lng, strReturn.results[0].geometry.location.lat];
+          }
+
+      d3.csv("bigpapa.csv", type, render);
+
+    </script>
+    <img src="usa.png" style="position: absolute; top: 123px; left: 145px; width:810px;height:415px; opacity: .2">
+  </body>
+</html>
