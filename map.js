@@ -1,9 +1,4 @@
 $(function() {
-	init(2010);
-});
-
-var init = function (year) {
-	console.log(year);
 	HashMap = function(){
 		this._dict = [];
 	}
@@ -29,18 +24,17 @@ var init = function (year) {
 			return couplet[1];
 		}
 	}
+	map = new HashMap();
 
-	var color = {}; // unique object instance
-	var shape = {}; // unique object instance
-	var map = new HashMap();
+	init("NPOPCHG2015");
+	initDropdown();
+});
 
-	//var locationInput = "venue_postal_cd_sgmt_1";
-	//var sizeInput = "tickets_purchased_qty";
-	//var colorInput = "delivery_type_cd";
+var init = function (inputParameter) {
 	var locationInput = "NAME";
-	var sizeInput = "CENSUS2010POP";
+	var sizeInput = inputParameter;
 
-	var unitsPerPixel = 5;
+	var unitsPerPixel = 0.004;
 
 	var innerWidth  = 800;
 	var innerHeight = 345;
@@ -64,8 +58,7 @@ var init = function (year) {
 		yScale.domain([24.40, 49.38]);
 
 		rScale.domain([0, d3.max(data, function (d){
-			//return d["tickets_purchased_qty"];
-			return d["CENSUS2010POP"];
+			return Math.abs(d[inputParameter]);
 		})]);
 
 		var unitsMax = rScale.domain()[1];
@@ -109,13 +102,16 @@ var init = function (year) {
 			if (isNaN(+rScale(d[sizeInput]))){
 				return 0;
 			} else {
-				return rScale(d[sizeInput]);
+				return rScale(Math.abs(d[sizeInput]));
 			}
 		})
-		.attr("id", function (d){ return d["NAME"] + ", " + d["CENSUS2010POP"]; })
+		.attr("id", function (d){ return d["NAME"] + ", " + d["NPOPCHG2010"]; })
 		.attr("fill", function (d) {
-			//return picker(d[colorInput]);
-			return "blue";
+			if (d[inputParameter] > 0) {
+				return "blue";
+			} else {
+				return "red";
+			}
 		})
 		.attr("stroke", "none");
 		circles.exit().remove();
@@ -141,4 +137,20 @@ var init = function (year) {
 	}
 
 	d3.csv("small.csv", type, render);
+}
+
+function initDropdown () {
+	var drowDown = $("#dropDown");
+	dropDown.onchange = selectorChange;
+
+	for (var i = 0; i < 6; ++i) {
+		var classItem = document.createElement("option");
+		classItem.innerHTML = "NPOPCHG201" + i;
+		dropDown.appendChild(classItem);
+	}
+}
+
+function selectorChange() {
+	d3.select("svg").remove();
+	init("NPOPCHG201" + (this.selectedIndex -1));
 }
