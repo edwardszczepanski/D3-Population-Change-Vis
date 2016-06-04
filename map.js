@@ -170,7 +170,7 @@ var init = function (inputParameter) {
 		return [strReturn.results[0].geometry.location.lng, strReturn.results[0].geometry.location.lat, strReturn.status];
 	}
 
-	d3.csv("large.csv", type, render);
+	d3.csv("medium.csv", type, render);
 }
 
 function initDropdown () {
