@@ -1,7 +1,9 @@
 body {
   background: black;
   color: white;
+  font-family: 'Poiret One', cursive !important;
+        font-size: 18px !important;
 }
 circle {
-  opacity: 0.3;
+  opacity: 0.4;
 }

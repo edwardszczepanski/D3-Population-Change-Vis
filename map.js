@@ -27,13 +27,19 @@ $(function() {
 	}
 	map = new HashMap();
 
+	if (localStorage.getItem("geoData") != undefined) {
+		var tempMap = JSON.parse(localStorage.getItem("geoData"));
+		for (var i = 0; i < tempMap._dict.length; ++i) {
+			map.put(tempMap._dict[i][0], [tempMap._dict[i][1][0], tempMap._dict[i][1][1]]);
+		}
+	}
+
 	initDropdown();
 	var slide = document.getElementById('slide');
-	slide.onchange = function() {
-		//console.log("NPOPCHG201" + ($('select[name="dropDown"]')[0].selectedIndex -1));
-		//console.log(1 / this.value);
+	slide.oninput = change;
+	function change () {
+		unitsPerPixel = 1 / this.value;
 		if (($('select[name="dropDown"]')[0].selectedIndex) != 0) {
-			unitsPerPixel = 1 / this.value;
 			d3.select("svg").remove();
 			init("NPOPCHG201" + ($('select[name="dropDown"]')[0].selectedIndex - 1));
 		}
@@ -86,13 +92,17 @@ var init = function (inputParameter) {
 					return +map.get(d[locationInput])[0];
 				}
 			} else {
+				console.log("Checking " + d["NAME"]);
 				var localCheck = getCoordinates(d[locationInput]);
-				if (localCheck[2] == "OK") {
-					map.put(d[locationInput], [+xScale(+localCheck[0]),
-					yScale(+localCheck[1])]);
-					return map.get(d[locationInput])[0];
-				} else {
-					map.put(d[locationInput], null);
+				if (localCheck != undefined) {
+					if (localCheck[2] == "OK") {
+						map.put(d[locationInput], [+xScale(+localCheck[0]), yScale(+localCheck[1])]);
+						localStorage.setItem("geoData", JSON.stringify(map));
+						return map.get(d[locationInput])[0];
+					} else {
+						//map.put(d[locationInput], null);
+						//Don't put bad entries into the map / local storage
+					}
 				}
 			}
 		})
@@ -132,6 +142,9 @@ var init = function (inputParameter) {
 	}
 
 	function getCoordinates(input) {
+		if (input == null || input == "" || input == undefined) {
+			return;
+		}
 		var strUrl = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBHPWGDrjRFk59k_FYuiujNmJo4APmKxqk&address=" + input, strReturn;
 
 		jQuery.ajax({
@@ -157,7 +170,7 @@ var init = function (inputParameter) {
 		return [strReturn.results[0].geometry.location.lng, strReturn.results[0].geometry.location.lat, strReturn.status];
 	}
 
-	d3.csv("small.csv", type, render);
+	d3.csv("large.csv", type, render);
 }
 
 function initDropdown () {
