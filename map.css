@@ -1,6 +1,7 @@
 body {
   background: black;
+  color: white;
 }
 circle {
-  opacity: 0.2;
+  opacity: 0.3;
 }

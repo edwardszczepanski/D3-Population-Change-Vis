@@ -1,4 +1,5 @@
 $(function() {
+	unitsPerPixel = 0.5;
 	HashMap = function(){
 		this._dict = [];
 	}
@@ -13,7 +14,7 @@ $(function() {
 		var couplet = this._get(key);
 		if(couplet){
 			couplet[1] = value;
-		}else{
+		} else{
 			this._dict.push([key, value]);
 		}
 		return this; // for chaining
@@ -26,20 +27,28 @@ $(function() {
 	}
 	map = new HashMap();
 
-	init("NPOPCHG2015");
 	initDropdown();
+	var slide = document.getElementById('slide');
+	slide.onchange = function() {
+		//console.log("NPOPCHG201" + ($('select[name="dropDown"]')[0].selectedIndex -1));
+		//console.log(1 / this.value);
+		if (($('select[name="dropDown"]')[0].selectedIndex) != 0) {
+			unitsPerPixel = 1 / this.value;
+			d3.select("svg").remove();
+			init("NPOPCHG201" + ($('select[name="dropDown"]')[0].selectedIndex - 1));
+		}
+	};
 });
 
 var init = function (inputParameter) {
 	var locationInput = "NAME";
 	var sizeInput = inputParameter;
 
-	var unitsPerPixel = 0.004;
-
 	var innerWidth  = 800;
 	var innerHeight = 345;
 	var margin = { left: 150, top: 150, right: 150, bottom: 150 };
 
+	document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represents a Change in 1 Person");
 
 	var svg = d3.select("body").append("svg")
 	.attr("width",  innerWidth + margin.left + margin.right)
@@ -132,6 +141,18 @@ var init = function (inputParameter) {
 			},
 			async:false
 		});
+
+		if (strReturn == undefined) {
+			console.log("str undefined");
+		} else if (strReturn.results[0] == undefined) {
+			console.log("results undefined");
+		} else if (strReturn.results[0].geometry == undefined) {
+			console.log("geometry undefined");
+		}
+
+		if (strReturn.results[0] == undefined || strReturn == undefined || strReturn.results[0].geometry == undefined) {
+			return [-100, -100, "Not Okay"];
+		}
 
 		return [strReturn.results[0].geometry.location.lng, strReturn.results[0].geometry.location.lat, strReturn.status];
 	}
