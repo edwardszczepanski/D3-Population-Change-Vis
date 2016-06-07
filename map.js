@@ -50,36 +50,32 @@ var init = function (inputParameter) {
 	var locationInput = "NAME";
 	var sizeInput = inputParameter;
 
-	var innerWidth  = 800;
-	var innerHeight = 345;
-	var margin = { left: 150, top: 150, right: 150, bottom: 150 };
+	var innerWidth  = $(window).width();
+	var innerHeight = $(window).height() - 100;
+
+	console.log("Inner Width: " + innerWidth + " Inner Height: " + innerHeight);
+
+	var margin = { left: 50, top: 50};
 
 	document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represents a Change in 1 Person");
 
 	var svg = d3.select("body").append("svg")
-	.attr("width",  innerWidth + margin.left + margin.right)
-	.attr("height", innerHeight + margin.top + margin.bottom);
+	.attr("width",  innerWidth)
+	.attr("height", innerHeight);
 
 	var g = svg.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	var xScale = d3.scale.linear().range([0, innerWidth]);
-	var yScale = d3.scale.linear().range([innerHeight, 0]);
-	var rScale = d3.scale.sqrt();
 
 	function render(data){
 
-		xScale.domain([-124.85, -66.80]);
-		yScale.domain([24.40, 49.38]);
+		var xScale = d3.scale.linear().domain([-124.85, -66.80]).range([0, innerWidth - margin.left]);
+		var yScale = d3.scale.linear().domain([24.40, 49.38]).range([innerHeight - margin.top, 0]);
 
-		rScale.domain([0, d3.max(data, function (d){
+		var unitsMax = d3.max(data, function (d){
 			return Math.abs(d[inputParameter]);
-		})]);
-
-		var unitsMax = rScale.domain()[1];
-		var rMin = 0;
-		var rMax = Math.sqrt(unitsMax / (unitsPerPixel * Math.PI));
-		rScale.range([rMin, rMax]);
+		});
+		var rScale = d3.scale.sqrt().domain([0, unitsMax]).range([0,Math.sqrt(unitsMax / (unitsPerPixel * Math.PI))]);
 
 		var circles = g.selectAll("circle").data(data);
 		circles.enter().append("circle");
@@ -87,21 +83,20 @@ var init = function (inputParameter) {
 		.attr("cx", function (d){
 			if (map.get(d[locationInput]) != null) {
 				if (isNaN(+map.get(d[locationInput])[0])){
+					console.log("X-Coordinate Value in map is not a number!");
 					return -100;
 				} else {
-					return +map.get(d[locationInput])[0];
+					//return +map.get(d[locationInput])[0];
+					return +xScale(+map.get(d[locationInput])[0]);
 				}
 			} else {
 				console.log("Checking " + d["NAME"]);
 				var localCheck = getCoordinates(d[locationInput]);
 				if (localCheck != undefined) {
 					if (localCheck[2] == "OK") {
-						map.put(d[locationInput], [+xScale(+localCheck[0]), yScale(+localCheck[1])]);
+						map.put(d[locationInput], [+localCheck[0], +localCheck[1]]);
 						localStorage.setItem("geoData", JSON.stringify(map));
-						return map.get(d[locationInput])[0];
-					} else {
-						//map.put(d[locationInput], null);
-						//Don't put bad entries into the map / local storage
+						return +xScale(+map.get(d[locationInput])[0]);
 					}
 				}
 			}
@@ -109,12 +104,14 @@ var init = function (inputParameter) {
 		.attr("cy", function (d){
 			if (map.get(d[locationInput]) != null) {
 				if (isNaN(+map.get(d[locationInput])[1])){
+					console.log("Size Value in map is not a number!");
 					return -100;
 				} else {
-					return +map.get(d[locationInput])[1];
+					//return +map.get(d[locationInput])[1];
+					return +yScale(+map.get(d[locationInput])[1]);
 				}
 			} else {
-				console.log("Something done went wrong");
+				console.log("Something went very wrong");
 			}
 		})
 		.attr("r",  function (d){
@@ -169,7 +166,6 @@ var init = function (inputParameter) {
 
 		return [strReturn.results[0].geometry.location.lng, strReturn.results[0].geometry.location.lat, strReturn.status];
 	}
-
 	d3.csv("medium.csv", type, render);
 }
 
