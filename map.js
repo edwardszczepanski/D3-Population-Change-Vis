@@ -57,10 +57,10 @@ var init = function(inputParameter) {
 		bottom: 20
   };
 
-  var innerWidth = $(window).width();
-  var innerHeight = $(window).height() - margin.top - margin.bottom;
+  var outerWidth = $(window).width();
+  var outerHeight = $(window).height() - margin.top - margin.bottom;
 
-  console.log("Inner Width: " + innerWidth + " Inner Height: " + innerHeight);
+  console.log("Outer Width: " + outerWidth + " Outer Height: " + outerHeight);
 
   document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represents a Change in 1 Person");
 
@@ -68,14 +68,32 @@ var init = function(inputParameter) {
     .attr("width", innerWidth)
     .attr("height", innerHeight);
 
-  //var g = svg.append("g")
-  //  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
   function render(data) {
 
-    var xScale = d3.scale.linear().domain([-124.85, -66.80]).range([0, innerWidth - margin.sides * 2]);
-    var yScale = d3.scale.linear().domain([24.40, 49.38]).range([innerHeight - margin.top - margin.bottom, 0]);
+		var innerWidth = outerWidth - margin.sides * 2;
+		var innerHeight = outerHeight - margin.top - margin.bottom;
+
+		// Coordinates of the US
+		var minX = -124.85;
+		var maxX = -66.80;
+		var minY = 24.40;
+		var maxY = 49.38;
+
+		var ratioUSA = (maxX - minX) / (maxY - minY);
+		console.log("Ratio " + ratioUSA);
+		var screenRatio = (innerWidth / innerHeight);
+		console.log("Screen Ratio " + screenRatio);
+		// If screenRatio is less than ratioUSA than it is too narrow. Use the width as basis
+		// if screenRatio is greater than ratioUSA than it is too long Use the height as basis
+
+		if (screenRatio < ratioUSA) {
+			innerHeight = innerWidth * (1 / ratioUSA);
+		} else {
+			innerWidth = innerHeight * ratioUSA;
+		}
+
+    var xScale = d3.scale.linear().domain([minX, maxX]).range([0, innerWidth]);
+    var yScale = d3.scale.linear().domain([minY, maxY]).range([innerHeight, 0]);
 
     var unitsMax = d3.max(data, function(d) {
       return Math.abs(d[inputParameter]);
@@ -94,7 +112,7 @@ var init = function(inputParameter) {
             return +xScale(+map.get(d[locationInput])[0]) + margin.sides;
           }
         } else {
-          console.log("Checking " + d["NAME"]);
+          console.log("Getting Coordinates for " + d["NAME"]);
           var localCheck = getCoordinates(d[locationInput]);
           if (localCheck != undefined) {
             if (localCheck[2] == "OK") {
