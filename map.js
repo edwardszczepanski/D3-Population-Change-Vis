@@ -34,6 +34,17 @@ $(function() {
     }
   }
 
+var doit;
+	$( window ).resize(function() {
+		clearTimeout(doit);
+  doit = setTimeout(resizedw, 10);
+	});
+
+	function resizedw(){
+    d3.select("svg").remove();
+		init("NPOPCHG201" + ($('select[name="dropDown"]')[0].selectedIndex - 1));
+}
+
   initDropdown();
   var slide = document.getElementById('slide');
   slide.oninput = change;
@@ -48,6 +59,7 @@ $(function() {
 });
 
 var init = function(inputParameter) {
+	console.log("Init!!!");
   var locationInput = "NAME";
   var sizeInput = inputParameter;
 
@@ -73,7 +85,7 @@ var init = function(inputParameter) {
 		var innerWidth = outerWidth - margin.sides * 2;
 		var innerHeight = outerHeight - margin.top - margin.bottom;
 
-		// Coordinates of the US
+		// Coordinates Bounds of the US
 		var minX = -124.85;
 		var maxX = -66.80;
 		var minY = 24.40;
