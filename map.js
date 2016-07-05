@@ -71,13 +71,7 @@ $(function() {
 });
 
 var init = function(inputParameter) {
-
-    d3.csv('small.csv', function(csv) {
-        csv.forEach(function(row) {
-          console.log(Object.keys(row));
-        });
-    });
-
+    var columnArray = ["NAME", "CENSUS2010POP", "POPESTIMATE2010", "POPESTIMATE2011", "POPESTIMATE2012", "POPESTIMATE2013", "POPESTIMATE2014", "POPESTIMATE2015", "NPOPCHG2010", "NPOPCHG2011", "NPOPCHG2012", "NPOPCHG2013", "NPOPCHG2014", "NPOPCHG2015", "BIRTHS2010", "BIRTHS2011", "BIRTHS2012", "BIRTHS2013", "BIRTHS2014", "BIRTHS2015", "DEATHS2010", "DEATHS2011", "DEATHS2012", "DEATHS2013", "DEATHS2014", "DEATHS2015", "NATURALINC2010", "NATURALINC2011", "NATURALINC2012", "NATURALINC2013", "NATURALINC2014", "NATURALINC2015", "INTERNATIONALMIG2010", "INTERNATIONALMIG2011", "INTERNATIONALMIG2012", "INTERNATIONALMIG2013", "INTERNATIONALMIG2014", "INTERNATIONALMIG2015", "DOMESTICMIG2010", "DOMESTICMIG2011", "DOMESTICMIG2012", "DOMESTICMIG2013", "DOMESTICMIG2014", "DOMESTICMIG2015"];
 
     var locationInput = "NAME";
     var sizeInput = inputParameter;
@@ -189,7 +183,12 @@ var init = function(inputParameter) {
             })
             .attr("stroke", "none")
             .on('click', function(d, i) {
-                alert(d["NAME"] + ", 2015 Population: " + d["POPESTIMATE2015"]);
+                var holderString = "";
+                for (var counter = 0; counter < columnArray.length; ++counter) {
+                    holderString = holderString + columnArray[counter] + ": " + d[columnArray[counter]] + "   ";
+                }
+                //alert(d["NAME"] + ", 2015 Population: " + d["POPESTIMATE2015"]);
+                alert(holderString);
                 d3.select(d["NAME"]).remove();
             });
         circles.exit().remove();
