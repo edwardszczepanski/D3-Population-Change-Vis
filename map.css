@@ -1,8 +1,8 @@
 body {
   background: black;
   color: white;
-  font-family: 'Poiret One', cursive !important;
-        font-size: 18px !important;
+  font-family: 'Montserrat', sans-serif, cursive !important;
+        font-size: 16px !important;
 }
 circle {
   opacity: 0.4;

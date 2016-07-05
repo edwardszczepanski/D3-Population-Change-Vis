@@ -26,13 +26,23 @@ $(function() {
         }
     }
     map = new HashMap();
+      
+    $.getJSON("geoData.json", function(json) {
+        var tempMap = json;//JSON.parse(json);
+        for (var i = 0; i < tempMap._dict.length; ++i) {
+            map.put(tempMap._dict[i][0], [tempMap._dict[i][1][0], tempMap._dict[i][1][1]]);
+        }
+        //console.log(json); // this will show the info it in firebug console
+    });
 
+    /*
     if (localStorage.getItem("geoData") != undefined) {
         var tempMap = JSON.parse(localStorage.getItem("geoData"));
         for (var i = 0; i < tempMap._dict.length; ++i) {
             map.put(tempMap._dict[i][0], [tempMap._dict[i][1][0], tempMap._dict[i][1][1]]);
         }
     }
+    */
 
     var doit;
     $(window).resize(function() {
@@ -61,13 +71,21 @@ $(function() {
 });
 
 var init = function(inputParameter) {
+
+    d3.csv('small.csv', function(csv) {
+        csv.forEach(function(row) {
+          console.log(Object.keys(row));
+        });
+    });
+
+
     var locationInput = "NAME";
     var sizeInput = inputParameter;
 
     var margin = {
         sides: 50,
-        top: 50,
-        bottom: 20
+        top: 52,
+        bottom: 60
     };
 
     var outerWidth = $(window).width();
@@ -115,13 +133,16 @@ var init = function(inputParameter) {
             .attr("cx", function(d) {
                 if (map.get(d[locationInput]) != null) {
                     if (isNaN(+map.get(d[locationInput])[0])) {
-                        console.log("X-Coordinate Value in map is not a number!");
+                        //console.log("X-Coordinate Value in map is not a number!");
                         return 10000;
                     } else {
                         return +xScale(+map.get(d[locationInput])[0]) + margin.sides;
                     }
                 } else {
-                    console.log("Getting Coordinates for " + d["NAME"]);
+                    //console.log("Getting Coordinates for " + d["NAME"]);
+
+                    // NO LONGER USING LOCAL STORAGE OR QUERYING GOOGLE MAPS IN REAL TIME
+                    /*
                     var localCheck = getCoordinates(d[locationInput]);
                     if (localCheck != undefined) {
                         if (localCheck[2] == "OK") {
@@ -130,20 +151,22 @@ var init = function(inputParameter) {
                             return +xScale(+map.get(d[locationInput])[0]) + margin.sides;
                         }
                     }
-                    console.log("Local Check is undefined and map is null");
+                    */
+
+                    //console.log("Local Check is undefined and map is null");
                     return 1000;
                 }
             })
             .attr("cy", function(d) {
                 if (map.get(d[locationInput]) != null) {
                     if (isNaN(+map.get(d[locationInput])[1])) {
-                        console.log("Size Value in map is not a number!");
+                        //console.log("Size Value in map is not a number!");
                         return 10000;
                     } else {
                         return +yScale(+map.get(d[locationInput])[1]) + margin.top;
                     }
                 } else {
-                    console.log("No value in map when searching for y value");
+                    //console.log("No value in map when searching for y value");
                     return 10000;
                 }
             })
@@ -170,7 +193,7 @@ var init = function(inputParameter) {
                 d3.select(d["NAME"]).remove();
             });
         circles.exit().remove();
-        document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represents a Change in 1 Person");
+        document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represents a Change in 1 Person &nbsp; &nbsp; <span style=\"color: blue;\">Blue</span> means Positive Growth, <span style=\"color: red\">Red</span> is Negative &nbsp; &nbsp; Click Circles for more Details");
     }
 
     function type(d) {
@@ -194,11 +217,11 @@ var init = function(inputParameter) {
         });
 
         if (strReturn == undefined) {
-            console.log("str undefined");
+            //console.log("str undefined");
         } else if (strReturn.results[0] == undefined) {
-            console.log("results undefined");
+            //console.log("results undefined");
         } else if (strReturn.results[0].geometry == undefined) {
-            console.log("geometry undefined");
+            //console.log("geometry undefined");
         }
 
         if (strReturn.results[0] == undefined || strReturn == undefined || strReturn.results[0].geometry == undefined) {
@@ -207,7 +230,7 @@ var init = function(inputParameter) {
 
         return [strReturn.results[0].geometry.location.lng, strReturn.results[0].geometry.location.lat, strReturn.status];
     }
-    d3.csv("medium.csv", type, render);
+    d3.csv("large.csv", type, render);
 }
 
 function initDropdown() {
