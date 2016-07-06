@@ -192,7 +192,7 @@ var init = function(inputParameter) {
                 d3.select(d["NAME"]).remove();
             });
         circles.exit().remove();
-        document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represents a Change in 1 Person &nbsp; &nbsp; <span style=\"color: blue;\">Blue</span> means Positive Growth, <span style=\"color: red\">Red</span> is Negative &nbsp; &nbsp; Click Circles for more Details");
+        document.getElementById("circleSize").innerHTML = (Math.round((1 / unitsPerPixel) * 100) / 100 + " Pixels Represent Population Change of 1 Person");
     }
 
     function type(d) {
