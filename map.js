@@ -1,5 +1,5 @@
 $(function() {
-    unitsPerPixel = 0.5;
+    unitsPerPixel = 100.0;
     HashMap = function() {
         this._dict = [];
     }
@@ -66,8 +66,8 @@ $(function() {
             init("NPOPCHG201" + ($('select[name="dropDown"]')[0].selectedIndex - 1));
         }
     };
-    init("NPOPCHG2010"); 
-    document.getElementById("dropDown").selectedIndex = 1;
+    init("NPOPCHG2015"); 
+    $('select[name="dropDown"]')[0].selectedIndex = 6;
 });
 
 var init = function(inputParameter) {
@@ -77,9 +77,9 @@ var init = function(inputParameter) {
     var sizeInput = inputParameter;
 
     var margin = {
-        sides: 50,
-        top: 52,
-        bottom: 60
+        sides: 200,
+        top: 120,
+        bottom: 100
     };
 
     var outerWidth = $(window).width();
@@ -106,6 +106,8 @@ var init = function(inputParameter) {
         var screenRatio = (innerWidth / innerHeight);
         // If screenRatio is less than ratioUSA than it is too narrow. Use the width as basis
         // if screenRatio is greater than ratioUSA than it is too long Use the height as basis
+
+        // DO STUFF HERE IF IT HAS TOO MUCH WIDTH TO CENTER IT! THIS IS IF THE BASIS of my problems
 
         if (screenRatio < ratioUSA) {
             innerHeight = innerWidth * (1 / ratioUSA);
@@ -235,12 +237,18 @@ var init = function(inputParameter) {
 function initDropdown() {
     var drowDown = $("#dropDown");
     dropDown.onchange = selectorChange;
-
+    /*
     for (var i = 0; i < 6; ++i) {
         var classItem = document.createElement("option");
         classItem.innerHTML = "NPOPCHG201" + i;
+        if (i == 5) {
+            classItem.selected = "selected";
+            classItem.selected = true;
+        }
         dropDown.appendChild(classItem);
     }
+    dropDown.selectedIndex = 5;
+    */
 }
 
 function selectorChange() {

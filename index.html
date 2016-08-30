@@ -19,14 +19,20 @@
     <!--select placeholder="Default">
       <option value="" disabled selected>Select Dataset</option>
     </select-->
-    <div style="margin-bottom: 10px; margin-top: 20px; font-size: 28px;">Population Change in the US over time</div>
-    <div>Blue Means Positive Growth, Red means Negative &nbsp &nbsp Click Circles for Full Details</div>
+    <div style="margin-bottom: 10px; margin-top: 20px; font-size: 34px;">Map of U.S. Population Change by Year</div>
+<div style="margin-bottom: 10px;"><span style="color: blue;">Blue</span> means Positive Growth, <span style="color: red;">Red</span> means Negative &nbsp &nbsp Click Circles for Full Details</div>
+    <span>&nbsp Pixel Density Slider: </span>
+    <input style="margin-top: 5px; margin-right: 8px;" id="slide" type="range" value="0.01" min="0.01" max="0.8" step="0.02">
     <span>Year Selector: &nbsp</span>
-    <select name="dropDown"id="dropDown" value="1">
-      <option value="" disabled selected>Select Year</option>
+    <select name="dropDown"id="dropDown">
+      <option value="0" disabled selected>Select Year</option>
+      <option value="1">NPOPCHG2010</option>
+      <option value="2">NPOPCHG2011</option>
+      <option value="3">NPOPCHG2012</option>
+      <option value="4">NPOPCHG2013</option>
+      <option value="5">NPOPCHG2014</option>
+      <option selected>NPOPCHG2015</option>
     </select>
-    <span>&nbsp Pixel Slider: </span>
-    <input style="margin-top: 5px; margin-left: 8px;" id="slide" type="range" min="0.01" max="1.1" step="0.02">
     <div style="margin-top: 10px;" id="circleSize"></div>
   </div>
 </body>
