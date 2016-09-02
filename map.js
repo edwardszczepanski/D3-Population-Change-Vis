@@ -67,9 +67,9 @@ var init = function(inputParameter) {
     var sizeInput = inputParameter;
 
     var margin = {
-        sides: 200,
-        top: 120,
-        bottom: 100
+        sides: 20,
+        top: 50,
+        bottom: 80
     };
 
     var outerWidth = $(window).width();
@@ -102,7 +102,7 @@ var init = function(inputParameter) {
         } else {
             innerWidth = innerHeight * ratioUSA;
             // Here I am adding padding to center the map 
-            marginLeft = (outerWidth - innerWidth) / 6;
+            marginLeft = (outerWidth - innerWidth) / 2;
             svg.attr("style", "margin-left: " + marginLeft +"px");
         }
 
