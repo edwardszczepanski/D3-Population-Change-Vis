@@ -17,7 +17,7 @@ $(function() {
         } else {
             this._dict.push([key, value]);
         }
-        return this; // for chaining
+        return this; 
     }
     HashMap.prototype.get = function(key) {
         var couplet = this._get(key);
@@ -28,21 +28,11 @@ $(function() {
     map = new HashMap();
       
     $.getJSON("geoData.json", function(json) {
-        var tempMap = json;//JSON.parse(json);
+        var tempMap = json;
         for (var i = 0; i < tempMap._dict.length; ++i) {
             map.put(tempMap._dict[i][0], [tempMap._dict[i][1][0], tempMap._dict[i][1][1]]);
         }
-        //console.log(json); // this will show the info it in firebug console
     });
-
-    /*
-    if (localStorage.getItem("geoData") != undefined) {
-        var tempMap = JSON.parse(localStorage.getItem("geoData"));
-        for (var i = 0; i < tempMap._dict.length; ++i) {
-            map.put(tempMap._dict[i][0], [tempMap._dict[i][1][0], tempMap._dict[i][1][1]]);
-        }
-    }
-    */
 
     var doit;
     $(window).resize(function() {
@@ -89,10 +79,10 @@ var init = function(inputParameter) {
 
     var svg = d3.select("body").append("svg")
         .attr("width", innerWidth)
-        .attr("height", innerHeight);
+        .attr("height", innerHeight)
+        .attr("style", "margin-left: 0px");
 
     function render(data) {
-
         var innerWidth = outerWidth - margin.sides * 2;
         var innerHeight = outerHeight - margin.top - margin.bottom;
 
@@ -107,12 +97,13 @@ var init = function(inputParameter) {
         // If screenRatio is less than ratioUSA than it is too narrow. Use the width as basis
         // if screenRatio is greater than ratioUSA than it is too long Use the height as basis
 
-        // DO STUFF HERE IF IT HAS TOO MUCH WIDTH TO CENTER IT! THIS IS IF THE BASIS of my problems
-
         if (screenRatio < ratioUSA) {
             innerHeight = innerWidth * (1 / ratioUSA);
         } else {
             innerWidth = innerHeight * ratioUSA;
+            // Here I am adding padding to center the map 
+            marginLeft = (outerWidth - innerWidth) / 6;
+            svg.attr("style", "margin-left: " + marginLeft +"px");
         }
 
         var xScale = d3.scale.linear().domain([minX, maxX]).range([0, innerWidth]);
@@ -129,40 +120,22 @@ var init = function(inputParameter) {
             .attr("cx", function(d) {
                 if (map.get(d[locationInput]) != null) {
                     if (isNaN(+map.get(d[locationInput])[0])) {
-                        //console.log("X-Coordinate Value in map is not a number!");
                         return 10000;
                     } else {
                         return +xScale(+map.get(d[locationInput])[0]) + margin.sides;
                     }
                 } else {
-                    //console.log("Getting Coordinates for " + d["NAME"]);
-
-                    // NO LONGER USING LOCAL STORAGE OR QUERYING GOOGLE MAPS IN REAL TIME
-                    /*
-                    var localCheck = getCoordinates(d[locationInput]);
-                    if (localCheck != undefined) {
-                        if (localCheck[2] == "OK") {
-                            map.put(d[locationInput], [+localCheck[0], +localCheck[1]]);
-                            localStorage.setItem("geoData", JSON.stringify(map));
-                            return +xScale(+map.get(d[locationInput])[0]) + margin.sides;
-                        }
-                    }
-                    */
-
-                    //console.log("Local Check is undefined and map is null");
                     return 1000;
                 }
             })
             .attr("cy", function(d) {
                 if (map.get(d[locationInput]) != null) {
                     if (isNaN(+map.get(d[locationInput])[1])) {
-                        //console.log("Size Value in map is not a number!");
                         return 10000;
                     } else {
                         return +yScale(+map.get(d[locationInput])[1]) + margin.top;
                     }
                 } else {
-                    //console.log("No value in map when searching for y value");
                     return 10000;
                 }
             })
@@ -189,7 +162,6 @@ var init = function(inputParameter) {
                 for (var counter = 0; counter < columnArray.length; ++counter) {
                     holderString = holderString + columnArray[counter] + ": " + d[columnArray[counter]] + "   ";
                 }
-                //alert(d["NAME"] + ", 2015 Population: " + d["POPESTIMATE2015"]);
                 alert(holderString);
                 d3.select(d["NAME"]).remove();
             });
@@ -217,14 +189,6 @@ var init = function(inputParameter) {
             async: false
         });
 
-        if (strReturn == undefined) {
-            //console.log("str undefined");
-        } else if (strReturn.results[0] == undefined) {
-            //console.log("results undefined");
-        } else if (strReturn.results[0].geometry == undefined) {
-            //console.log("geometry undefined");
-        }
-
         if (strReturn.results[0] == undefined || strReturn == undefined || strReturn.results[0].geometry == undefined) {
             return [-100, -100, "Not Okay"];
         }
@@ -237,18 +201,6 @@ var init = function(inputParameter) {
 function initDropdown() {
     var drowDown = $("#dropDown");
     dropDown.onchange = selectorChange;
-    /*
-    for (var i = 0; i < 6; ++i) {
-        var classItem = document.createElement("option");
-        classItem.innerHTML = "NPOPCHG201" + i;
-        if (i == 5) {
-            classItem.selected = "selected";
-            classItem.selected = true;
-        }
-        dropDown.appendChild(classItem);
-    }
-    dropDown.selectedIndex = 5;
-    */
 }
 
 function selectorChange() {
